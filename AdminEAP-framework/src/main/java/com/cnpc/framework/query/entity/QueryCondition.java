@@ -9,7 +9,7 @@ import com.cnpc.framework.utils.StrUtil;
 
 public class QueryCondition {
 
-    //
+    //分页信息
     private PageInfo pageInfo;
 
     private String sortInfo;
@@ -24,8 +24,8 @@ public class QueryCondition {
 
     private QueryConfig queryConfig;
 
-    // -----------------数据权限--------------------
-    private String pageName;// 当前请求页面的路径
+
+    private String pageName;
 
     // ----------------------表格---------------------------
     // 导出Excel
@@ -41,20 +41,20 @@ public class QueryCondition {
     private String sheetMethod;
 
     // --------------------------------------------------
+
+    public String getPageName() {
+        return pageName;
+    }
+
+    public void setPageName(String pageName) {
+        this.pageName = pageName;
+    }
+
     public String getQueryId() {
 
         return queryId;
     }
 
-    public String getPageName() {
-
-        return pageName;
-    }
-
-    public void setPageName(String pageName) {
-
-        this.pageName = pageName;
-    }
 
     public void setQueryId(String queryId) {
 

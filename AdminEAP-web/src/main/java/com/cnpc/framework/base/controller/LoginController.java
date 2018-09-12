@@ -1,5 +1,6 @@
 package com.cnpc.framework.base.controller;
 
+import com.cnpc.framework.base.entity.Function;
 import com.cnpc.framework.base.entity.User;
 import com.cnpc.framework.base.pojo.ResultCode;
 import com.cnpc.framework.base.service.FunctionService;
@@ -10,6 +11,7 @@ import com.cnpc.framework.oauth.common.CustomOAuthService;
 import com.cnpc.framework.oauth.entity.OAuthUser;
 import com.cnpc.framework.oauth.service.OAuthServices;
 import com.cnpc.framework.oauth.service.OAuthUserService;
+import com.cnpc.framework.util.SecurityUtil;
 import com.cnpc.framework.utils.EncryptUtil;
 import com.cnpc.framework.utils.PropertiesUtil;
 import com.cnpc.framework.utils.StrUtil;
@@ -28,9 +30,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 @Controller
 public class LoginController {
@@ -89,7 +89,7 @@ public class LoginController {
             if (subject.isAuthenticated()) {
                 String userId = subject.getPrincipal().toString();
                 Set<String> roles = roleService.getRoleCodeSet(userId);
-                Set<String> functions = functionService.getFunctionCodeSet(roles, userId);
+                //Set<String> functions = functionService.getFunctionCodeSet(roles, userId);
                 //---------调用realm doGetAuthorizationInfo----------
                 boolean isPermitted = subject.isPermitted("user");
                 if (!roles.isEmpty()) {
@@ -138,6 +138,32 @@ public class LoginController {
         }
         return LOGIN_PAGE;
     }
+
+
+    @RequestMapping(value = "/function/getlist", method = RequestMethod.POST)
+    @ResponseBody
+    public List<Function> getUserFunctions() {
+        List<Function> functionList = new ArrayList<>();
+        User user = SecurityUtil.getUser();
+        Set<String> roles = roleService.getRoleCodeSet(user.getId());
+        if ("1".equals(user.getIsSuperAdmin())) {
+            functionList = functionService.getAll();
+        } else {
+            functionList = functionService.getFunctionList(roles, user.getId());
+        }
+
+        Map<String,Function> map=new HashMap<>();
+        for (Function function : functionList) {
+            if(StrUtil.isNotBlank(function.getQueryId())&&!map.containsKey(function.getQueryId())){
+                map.put(function.getQueryId(),function);
+            }
+        }
+        SecurityUtils.getSubject().getSession().setAttribute("functionMap", map);
+        return functionList;
+    }
+
+
+
 
 
  /*   @RequestMapping(value = "/logout")
